@@ -2,11 +2,13 @@ package com.ishanknijhawan.listapps
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.media.Image
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_layout.view.*
 import java.util.jar.Manifest
 
-class AppAdapter(val items: MutableList<String>,val context: Context) :
+class AppAdapter(val items: MutableList<AppName>,val context: Context) :
     RecyclerView.Adapter<ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_layout,parent,false))
@@ -30,7 +32,7 @@ class AppAdapter(val items: MutableList<String>,val context: Context) :
         val string: StringBuffer? = null
         try {
             val pm = context.packageManager
-            val packageInfo = pm.getPackageInfo(items[position], PackageManager.GET_PERMISSIONS)
+            val packageInfo = pm.getPackageInfo(items[position].packageName, PackageManager.GET_PERMISSIONS)
             string?.append(packageInfo.packageName+"*******:\n")
             val requestedPermissions = packageInfo.requestedPermissions
             if(requestedPermissions != null) {
@@ -42,22 +44,21 @@ class AppAdapter(val items: MutableList<String>,val context: Context) :
             val apk = ApkInfoExtractor(context)
 
             bool = if (PackageManager.PERMISSION_GRANTED == context.packageManager.checkPermission(android.Manifest.permission.RECORD_AUDIO
-                    ,items[position])){
+                    ,items[position].packageName)){
                 "true"
             } else
                 "false"
 
-            holder.appName.text = apk.GetAppName(items[position])
+            holder.appName.text = items[position].appName
             holder.itemView.setOnClickListener {
                 //Toast.makeText(context, bool,Toast.LENGTH_SHORT).show()
-                val intent = pm.getLaunchIntentForPackage(items[position])
-                if (intent != null)
-                    context.startActivity(intent)
-                else
-                    Toast.makeText(context, "App not user accessible", Toast.LENGTH_SHORT).show()
+                //val intent = pm.getLaunchIntentForPackage(items[position])
+                val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                intent.data = Uri.parse("package:${items[position].packageName}")
+                context.startActivity(intent)
             }
 
-            val icon = context.packageManager.getApplicationIcon(items[position])
+            val icon = context.packageManager.getApplicationIcon(items[position].packageName)
             holder.icon.setImageDrawable(icon)
 
         }catch (e: Exception){
