@@ -33,15 +33,24 @@ class MainActivity : AppCompatActivity() {
 
         val pm = packageManager
         val packages =
-            pm.getInstalledApplications(PackageManager.GET_META_DATA)
+            pm.getInstalledPackages(PackageManager.GET_META_DATA)
 
         val p = packageManager
         val appinstall =
         p.getInstalledPackages(0)
 
+        val finalList = mutableListOf<String>()
+        for (i in 0 until packages.size){
+            val packageName = packages[i].packageName
+            if (pm.getLaunchIntentForPackage(packageName) != null){
+                finalList.add(packageName)
+            }
+        }
+
+
         rv_main_list.layoutManager = LinearLayoutManager(this)
-        rv_main_list.adapter = AppAdapter(packages, this)
-        tvCount.text = "${packages.size} apps found"
+        rv_main_list.adapter = AppAdapter(finalList, this)
+        tvCount.text = "${finalList.size} apps found"
 
         switch2.setOnClickListener {
             if (switch2.isChecked){
