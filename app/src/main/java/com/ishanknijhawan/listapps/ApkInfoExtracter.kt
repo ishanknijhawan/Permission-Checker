@@ -35,14 +35,14 @@ class ApkInfoExtractor(context2: Context) {
     fun getAppIconByPackageName(ApkTempPackageName: String?): Drawable? {
         val drawable: Drawable
         drawable =
-            context1.getPackageManager().getApplicationIcon(ApkTempPackageName)
+            context1.packageManager.getApplicationIcon(ApkTempPackageName)
         return drawable
     }
 
     fun GetAppName(ApkPackageName: String?): String? {
         var Name = ""
         val applicationInfo: ApplicationInfo
-        val packageManager: PackageManager = context1.getPackageManager()
+        val packageManager: PackageManager = context1.packageManager
         try {
             applicationInfo = packageManager.getApplicationInfo(ApkPackageName, 0)
             if (applicationInfo != null) {
