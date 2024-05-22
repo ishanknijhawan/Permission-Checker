@@ -9,10 +9,9 @@
         android:layout_width="match_parent"
         android:id="@+id/spinner"
         android:padding="4dp"
-        style="@style/Widget.AppCompat.DropDownItem.Spinner"
         android:layout_margin="8sp"
         android:layout_marginBottom="8sp"
-        android:layout_height="?attr/actionBarSize"/>
+        android:layout_height="56dp"/>
 
     <TextView
         android:layout_width="match_parent"

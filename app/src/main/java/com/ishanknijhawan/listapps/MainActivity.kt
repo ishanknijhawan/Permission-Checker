@@ -1,9 +1,11 @@
 package com.ishanknijhawan.listapps
 
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -11,12 +13,13 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_main.*
+import androidx.recyclerview.widget.RecyclerView
 
 
-class MainActivity : AppCompatActivity(), AppAdapter.OnItemClickListener {
+class MainActivity : Activity(), AppAdapter.OnItemClickListener {
 
     lateinit var permissionsArray: ArrayList<String>
     lateinit var appPackageName: String
@@ -24,7 +27,7 @@ class MainActivity : AppCompatActivity(), AppAdapter.OnItemClickListener {
     lateinit var appInfo: ApplicationInfo
     lateinit var appIcon: Drawable
     lateinit var adapter: AppAdapter
-    lateinit var packages: MutableList<PackageInfo>
+    lateinit var packages: MutableList<ResolveInfo>
     private val appList = mutableListOf<AppName>()
     private val cameraList = mutableListOf<AppName>()
     private val contactsList = mutableListOf<AppName>()
@@ -33,9 +36,17 @@ class MainActivity : AppCompatActivity(), AppAdapter.OnItemClickListener {
     private val storagemediaList = mutableListOf<AppName>()
     private val smsList = mutableListOf<AppName>()
 
+    private lateinit var rvList: RecyclerView
+    private lateinit var spinner: Spinner
+    private lateinit var tvCount: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        rvList = findViewById(R.id.rv_main_list)
+        spinner = findViewById(R.id.spinner)
+        tvCount = findViewById(R.id.tvCount)
 
         permissionsArray = arrayListOf(
             "All apps",
@@ -49,13 +60,22 @@ class MainActivity : AppCompatActivity(), AppAdapter.OnItemClickListener {
 
         initSpinner()
 
-        packages = packageManager.getInstalledPackages(PackageManager.GET_META_DATA)
+        //packages = packageManager.getInstalledPackages(PackageManager.GET_META_DATA)
+
+        val intent = Intent(Intent.ACTION_MAIN, null)
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+        packages = packageManager.queryIntentActivities(intent, 0)
 
         for (i in 0 until packages.size) {
-            appPackageName = packages[i].packageName
+            appPackageName = packages[i].activityInfo.packageName
             appInfo = packageManager.getApplicationInfo(appPackageName, 0)
-            appName = packageManager.getApplicationLabel(appInfo) as String
-            appIcon = packageManager.getApplicationIcon(appPackageName)
+            appName = packageManager.getApplicationLabel(
+                packageManager.getApplicationInfo(
+                    packages[i].activityInfo.packageName,
+                    PackageManager.GET_META_DATA
+                )
+            ).toString()
+            appIcon = packages[i].loadIcon(packageManager)
 
             if (packageManager.getLaunchIntentForPackage(appPackageName) != null) {
                 appList.add(AppName(appPackageName, appName, appIcon))
@@ -89,7 +109,7 @@ class MainActivity : AppCompatActivity(), AppAdapter.OnItemClickListener {
         microphoneList.sortBy { it.appName }
         storagemediaList.sortBy { it.appName }
         smsList.sortBy { it.appName }
-        rv_main_list.layoutManager = LinearLayoutManager(this)
+        rvList.layoutManager = LinearLayoutManager(this)
 
         spinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(
@@ -102,38 +122,38 @@ class MainActivity : AppCompatActivity(), AppAdapter.OnItemClickListener {
                 when (text) {
                     permissionsArray[0] -> {    //All apps
                         adapter = AppAdapter(appList, applicationContext, this@MainActivity)
-                        rv_main_list.adapter = adapter
+                        rvList.adapter = adapter
                         tvCount.text = "${appList.size} apps found"
                     }
                     permissionsArray[1] -> {    //Camera
                         adapter = AppAdapter(cameraList, applicationContext, this@MainActivity)
-                        rv_main_list.adapter = adapter
+                        rvList.adapter = adapter
                         tvCount.text = "${cameraList.size} apps found"
                     }
                     permissionsArray[2] -> {    //Contacts
                         adapter = AppAdapter(contactsList, applicationContext, this@MainActivity)
-                        rv_main_list.adapter = adapter
+                        rvList.adapter = adapter
                         tvCount.text = "${contactsList.size} apps found"
                     }
                     permissionsArray[3] -> {    //Location
                         adapter = AppAdapter(locationList, applicationContext, this@MainActivity)
-                        rv_main_list.adapter = adapter
+                        rvList.adapter = adapter
                         tvCount.text = "${locationList.size} apps found"
                     }
                     permissionsArray[4] -> {       //Microphone
                         adapter = AppAdapter(microphoneList, applicationContext, this@MainActivity)
-                        rv_main_list.adapter = adapter
+                        rvList.adapter = adapter
                         tvCount.text = "${microphoneList.size} apps found"
                     }
                     permissionsArray[5] -> {       //Storage & Media
                         adapter =
                             AppAdapter(storagemediaList, applicationContext, this@MainActivity)
-                        rv_main_list.adapter = adapter
+                        rvList.adapter = adapter
                         tvCount.text = "${storagemediaList.size} apps found"
                     }
                     permissionsArray[6] -> {    //Sms
                         adapter = AppAdapter(smsList, applicationContext, this@MainActivity)
-                        rv_main_list.adapter = adapter
+                        rvList.adapter = adapter
                         tvCount.text = "${smsList.size} apps found"
                     }
                 }
@@ -146,14 +166,14 @@ class MainActivity : AppCompatActivity(), AppAdapter.OnItemClickListener {
 
     }
 
-    private fun checkCameraPermission(appPackageName: String?): Boolean {
+    private fun checkCameraPermission(appPackageName: String): Boolean {
         return PackageManager.PERMISSION_GRANTED == packageManager.checkPermission(
             android.Manifest.permission.CAMERA,
             appPackageName
         )
     }
 
-    private fun checkContactsPermission(appPackageName: String?): Boolean {
+    private fun checkContactsPermission(appPackageName: String): Boolean {
         return (PackageManager.PERMISSION_GRANTED == packageManager.checkPermission(
             android.Manifest.permission.READ_CONTACTS,
             appPackageName
@@ -163,7 +183,7 @@ class MainActivity : AppCompatActivity(), AppAdapter.OnItemClickListener {
         ))
     }
 
-    private fun checkLocationPermission(appPackageName: String?): Boolean {
+    private fun checkLocationPermission(appPackageName: String): Boolean {
         return (PackageManager.PERMISSION_GRANTED == packageManager.checkPermission(
             android.Manifest.permission.ACCESS_FINE_LOCATION,
             appPackageName
@@ -173,14 +193,14 @@ class MainActivity : AppCompatActivity(), AppAdapter.OnItemClickListener {
         ))
     }
 
-    private fun checkMicrophonePermission(appPackageName: String?): Boolean {
+    private fun checkMicrophonePermission(appPackageName: String): Boolean {
         return PackageManager.PERMISSION_GRANTED == packageManager.checkPermission(
             android.Manifest.permission.RECORD_AUDIO,
             appPackageName
         )
     }
 
-    private fun checkStoragePermission(appPackageName: String?): Boolean {
+    private fun checkStoragePermission(appPackageName: String): Boolean {
         return (PackageManager.PERMISSION_GRANTED == packageManager.checkPermission(
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             appPackageName
@@ -190,7 +210,7 @@ class MainActivity : AppCompatActivity(), AppAdapter.OnItemClickListener {
         ))
     }
 
-    private fun checkSmsPermission(appPackageName: String?): Boolean {
+    private fun checkSmsPermission(appPackageName: String): Boolean {
         return (PackageManager.PERMISSION_GRANTED == packageManager.checkPermission(
             android.Manifest.permission.READ_SMS,
             appPackageName

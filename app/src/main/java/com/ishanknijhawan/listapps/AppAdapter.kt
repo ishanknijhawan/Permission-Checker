@@ -1,23 +1,12 @@
 package com.ishanknijhawan.listapps
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
-import android.media.Image
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ImageView
-import android.widget.Toast
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_layout.view.*
-import java.util.jar.Manifest
 
 class AppAdapter(
     val items: MutableList<AppName>,
@@ -42,8 +31,8 @@ class AppAdapter(
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val icon: ImageView = itemView.iv_icon
-        val appName = itemView.tv_appname
+        val icon: ImageView = itemView.findViewById(R.id.iv_icon)
+        val appName: TextView = itemView.findViewById(R.id.tv_appname)
 
         fun setOnClick(clickListener: OnItemClickListener, position: Int) {
             itemView.setOnClickListener {

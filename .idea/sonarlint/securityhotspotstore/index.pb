@@ -1,0 +1,21 @@
+
+X
+(gradle/wrapper/gradle-wrapper.properties,f/b/fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
+@
+build.gradle.kts,d/b/dbcff70658daf80b53ce624f6adcaa529df5ed8d
+I
+gradle/libs.versions.toml,d/7/d7595319a0658be6f1ed500ad590d42e4b28bc4f
+P
+ app/src/main/AndroidManifest.xml,8/c/8c55c3ccc257e5907959013f99656e4c8ec3903e
+C
+settings.gradle.kts,7/4/749edfcc96398253e5b3416184e95c46621da850
+D
+app/build.gradle.kts,d/2/d2a4383452aad84a18429a5844d31330a012a9e6
+m
+=app/src/main/java/com/ishanknijhawan/listapps/MainActivity.kt,4/7/47c3602b1f18da2ec94ce3fbd6eeb00e9e0dadba
+q
+Aapp/src/main/java/com/ishanknijhawan/listapps/ApkInfoExtracter.kt,6/8/688d3ecfee9dc37c039b03876d4f15a4ad871b98
+k
+;app/src/main/java/com/ishanknijhawan/listapps/AppAdapter.kt,d/5/d5f819c4d6713c6ec6bd22db29b0c86f338fc08b
+h
+8app/src/main/java/com/ishanknijhawan/listapps/AppName.kt,6/a/6aa8a9090fcce8ffa81dd141b4da8b03c0431abb
